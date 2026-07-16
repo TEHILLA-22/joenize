@@ -279,11 +279,7 @@ export function MarketplacePage() {
           {featured.length === 0 ? (
             <EmptyMarketplaceSection
               action="Create an account to prepare your first procurement cart"
-              description={
-                typeof window !== "undefined" && window.location.hostname === "localhost"
-                  ? "Create products as a seller to see them featured here."
-                  : "No supplier products are published in the marketplace yet."
-              }
+              description="No supplier products are published in the marketplace yet."
               title="No featured products yet"
             />
           ) : (
