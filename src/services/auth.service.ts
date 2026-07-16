@@ -12,13 +12,13 @@ import type {
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8000/api";
+  "https://joenize-back.onrender.com/api";
 
 export function getBackendOrigin(): string {
   try {
     return new URL(apiBaseUrl).origin;
   } catch {
-    return "http://localhost:8000";
+    return "https://joenize-back.onrender.com";
   }
 }
 

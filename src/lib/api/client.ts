@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useOrganizationStore } from "@/stores/organization-store";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://joenize-back.onrender.com/api";
 
 export const apiClient = axios.create({
   baseURL,
