@@ -1,0 +1,46 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+
+
+@theme {
+  --color-brand-primary: #1E1E1E; /* Charcoal */
+  --color-brand-primary-light: #2A2A2A; 
+  --color-brand-accent: #C4A574; /* Muted gold / sand */
+  --color-brand-accent-light: #D4B98E;
+  --color-brand-background: #F5F3EF;
+  --color-brand-success: #4F7A57; /* Deep muted olive */
+  --color-brand-error: #8B3A3A; /* Muted red */
+}
+
+:root {
+  --background: var(--color-brand-background);
+  --foreground: var(--color-brand-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--color-brand-primary);
+    --foreground: var(--color-brand-background);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Custom Utilities for Auth Transitions */
+.auth-panel-transition {
+  transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.5s ease;
+}
+
+/* Parallax base classes */
+.parallax-bg {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
