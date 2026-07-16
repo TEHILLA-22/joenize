@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiClient } from "@/lib/api/client";
 import { useAuthStore } from "@/stores/auth-store";
@@ -11,6 +11,14 @@ import Link from "next/link";
 type Step = "form" | "processing" | "paying" | "verifying" | "done" | "error";
 
 export default function SellerOnboardingPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#F5F3EF]"><Loader2 className="h-8 w-8 animate-spin text-[#4F7A57]" /></div>}>
+      <SellerOnboardingContent />
+    </Suspense>
+  );
+}
+
+function SellerOnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useAuthStore((state) => state.user);
