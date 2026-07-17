@@ -115,6 +115,11 @@ export function OAuthButtons({
       (state) =>
         state.setAccessToken
     );
+  const setRefreshToken =
+    useAuthStore(
+      (state) =>
+        state.setRefreshToken
+    );
   const setUser =
     useAuthStore(
       (state) => state.setUser
@@ -158,6 +163,12 @@ export function OAuthButtons({
         setAccessToken(
           result.access
         );
+
+        if (result.refresh_token) {
+          setRefreshToken(
+            result.refresh_token
+          );
+        }
 
         setUser(result.user);
 

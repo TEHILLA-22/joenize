@@ -16,6 +16,7 @@ let refreshPromise:
 type RetriableRequestConfig =
   InternalAxiosRequestConfig & {
     _retry?: boolean;
+    _retryCount?: number;
   };
 
 apiClient.interceptors.response.use(
@@ -44,7 +45,7 @@ apiClient.interceptors.response.use(
 
     if (
       originalRequest.url?.includes(
-        "/auth/refresh/"
+        "/auth/refresh"
       )
     ) {
       useAuthStore
@@ -77,6 +78,14 @@ apiClient.interceptors.response.use(
                 .setAccessToken(
                   response.access
                 );
+
+              if (response.refresh_token) {
+                useAuthStore
+                  .getState()
+                  .setRefreshToken(
+                    response.refresh_token
+                  );
+              }
 
               return (
                 response.access

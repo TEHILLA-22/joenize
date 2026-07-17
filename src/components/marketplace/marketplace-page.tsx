@@ -6,8 +6,8 @@ import type {
 } from "react";
 import { useEffect, useRef, useState } from "react";
 import {
-  ArrowRight, Building2, ChevronLeft, ChevronRight, Factory,
-  PackageSearch, Search, ShieldCheck, Sparkles, Store,
+  ArrowRight, Building2, ChevronLeft, ChevronRight, Factory, FileText,
+  PackageSearch, Search, SendHorizontal, ShieldCheck, Sparkles, Store,
 } from "lucide-react";
 import {
   CategoryCard,
@@ -17,6 +17,7 @@ import {
 } from "@/components/categories/category-nav";
 import { useAuthStore } from "@/stores/auth-store";
 import { apiClient } from "@/lib/api/client";
+import { imageUrl } from "@/lib/api/uploads";
 
 const categoryLabels = [
   "Electronics",
@@ -56,15 +57,18 @@ function MarketplaceHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm font-medium text-[#6B6B6B] md:flex">
-          <CategoryDropdown />
-          <Link className="hover:text-[#1E1E1E]" href="#suppliers">
-            Suppliers
-          </Link>
-          <Link className="hover:text-[#1E1E1E]" href={sellerHref}>
-            Sell on Joenize
-          </Link>
-        </nav>
+          <nav className="hidden items-center gap-6 text-sm font-medium text-[#6B6B6B] md:flex">
+            <CategoryDropdown />
+            <Link className="hover:text-[#1E1E1E]" href="/rfq/market">
+              RFQs
+            </Link>
+            <Link className="hover:text-[#1E1E1E]" href="#suppliers">
+              Suppliers
+            </Link>
+            <Link className="hover:text-[#1E1E1E]" href={sellerHref}>
+              Sell on Joenize
+            </Link>
+          </nav>
 
         <div className="flex items-center gap-2">
           {!isAuthenticated ? (
@@ -160,10 +164,12 @@ function SectionShell({
 
 export function MarketplacePage() {
   const [featured, setFeatured] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    apiClient.get("/products/featured/").then((res) => setFeatured(res.data.results || [])).catch(() => {});
+    apiClient.get("/products/featured").then((res) => setFeatured(res.data.results || [])).catch(() => {});
+    apiClient.get("/products").then((res) => setAllProducts(res.data.results || [])).catch(() => {});
   }, []);
 
   function scrollCarousel(dir: "left" | "right") {
@@ -290,11 +296,11 @@ export function MarketplacePage() {
               </button>
               <div ref={scrollRef} className="flex gap-4 overflow-x-auto scroll-smooth pb-2 scrollbar-hide">
                 {featured.map((p: any) => (
-                  <Link key={p.id} href={`/marketplace?product=${p.id}`}
+                  <Link key={p.id} href={`/product/${p.id}`}
                     className="flex-shrink-0 w-64 rounded-xl border border-[#D8D3CC] bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
                     <div className="aspect-square rounded-lg bg-[#F5F3EF] overflow-hidden mb-3">
                       {p.images && p.images.length > 0 ? (
-                        <img src={p.images[0].url} alt={p.name} className="h-full w-full object-cover" />
+                        <img src={imageUrl(p.images[0].url)} alt={p.name} className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full items-center justify-center text-[#D8D3CC] text-xs">No image</div>
                       )}
@@ -313,6 +319,36 @@ export function MarketplacePage() {
         </SectionShell>
 
         <SectionShell
+          description="Browse all products published by our verified sellers."
+          title="All Products"
+        >
+          {allProducts.length === 0 ? (
+            <EmptyMarketplaceSection
+              action="Check back soon"
+              description="No products published in the marketplace yet."
+              title="No products yet"
+            />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {allProducts.map((p: any) => (
+                <Link key={p.id} href={`/product/${p.id}`}
+                  className="rounded-xl border border-[#D8D3CC] bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="aspect-square rounded-lg bg-[#F5F3EF] overflow-hidden mb-3">
+                    {p.images && p.images.length > 0 ? (
+                      <img src={imageUrl(p.images[0].url)} alt={p.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[#D8D3CC] text-xs">No image</div>
+                    )}
+                  </div>
+                  <p className="text-sm font-semibold text-[#1E1E1E] truncate">{p.name}</p>
+                  <p className="text-xs text-[#6B6B6B]">${p.price?.toFixed?.(2) || "—"} &middot; {p.seller?.username || "Seller"}</p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </SectionShell>
+
+        <SectionShell
           description="Verified supplier storefronts will appear here with ratings, response rates, and catalogs."
           id="suppliers"
           title="Verified Suppliers"
@@ -322,6 +358,38 @@ export function MarketplacePage() {
             description="Supplier storefronts will show once business verification and product publishing are complete."
             title="No verified supplier storefronts yet"
           />
+        </SectionShell>
+
+        <SectionShell
+          description="Browse open buyer requests and submit competitive quotes."
+          title="RFQ Marketplace"
+        >
+          <div className="flex items-center justify-between rounded-xl border border-[#D8D3CC] bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <FileText className="h-8 w-8 text-[#4F7A57]" />
+              <div>
+                <p className="text-sm font-semibold text-[#1E1E1E]">Browse open RFQs</p>
+                <p className="text-xs text-[#6B6B6B]">Buyers post requests, suppliers compete to win orders.</p>
+              </div>
+            </div>
+            <Link href="/rfq/market"
+              className="inline-flex items-center gap-2 rounded-md bg-[#4F7A57] px-4 py-2 text-sm font-medium text-white hover:bg-[#3D6344]">
+              View RFQs <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="mt-3 flex items-center justify-between rounded-xl border border-[#D8D3CC] bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <SendHorizontal className="h-8 w-8 text-[#1E1E1E]" />
+              <div>
+                <p className="text-sm font-semibold text-[#1E1E1E]">Need a specific product?</p>
+                <p className="text-xs text-[#6B6B6B]">Post an RFQ describing exactly what you need.</p>
+              </div>
+            </div>
+            <Link href="/rfq/create"
+              className="inline-flex items-center gap-2 rounded-md bg-[#1E1E1E] px-4 py-2 text-sm font-medium text-white hover:bg-[#2A2A2A]">
+              Post RFQ <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </SectionShell>
 
         <SectionShell

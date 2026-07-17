@@ -64,7 +64,7 @@ async function getWalletBalance(): Promise<string> {
     const response =
       await apiClient.get<
         Record<string, unknown>
-      >("/payments/wallet/");
+      >("/payments/wallet");
 
     const balance =
       response.data.balance ??
@@ -104,16 +104,16 @@ export async function getBuyerWorkspaceSummary(): Promise<BuyerWorkspaceSummary>
     walletBalance,
   ] = await Promise.all([
     getListCount(
-      "/procurement/rfqs/"
+      "/procurement/rfqs"
     ),
     getListCount(
-      "/orders/"
+      "/orders"
     ),
     getListCount(
-      "/invoices/"
+      "/invoices"
     ),
     getListCount(
-      "/shipping/"
+      "/shipping"
     ),
     getWalletBalance(),
   ]);

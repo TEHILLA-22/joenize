@@ -5,6 +5,7 @@ import { Camera, User, Lock, Building, MapPin, Sliders, CheckCircle2, AlertCircl
 import { useAuthStore } from "@/stores/auth-store";
 import { me } from "@/services/auth.service";
 import { apiClient } from "@/lib/api/client";
+import { imageUrl } from "@/lib/api/uploads";
 
 const TABS = [
   { id: "profile", label: "Profile", icon: User },
@@ -25,7 +26,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     // Fetch Organization Data
-    apiClient.get("/organizations/my-organization/")
+    apiClient.get("/organizations/my-organization")
       .then(res => setOrgData(res.data))
       .catch(err => console.error("Failed to fetch organization", err));
       
@@ -43,7 +44,7 @@ export default function AccountPage() {
     setIsSaving(true);
     setSaveStatus("idle");
     try {
-      await apiClient.patch("/accounts/users/me/", { phone_number: userData.phone_number });
+      await apiClient.patch("/accounts/users/me", { phone_number: userData.phone_number });
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 3000);
     } catch (e) {
@@ -57,7 +58,7 @@ export default function AccountPage() {
     setIsSaving(true);
     setSaveStatus("idle");
     try {
-      await apiClient.patch("/organizations/my-organization/", orgData);
+      await apiClient.patch("/organizations/my-organization", orgData);
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 3000);
     } catch (e) {
@@ -78,7 +79,7 @@ export default function AccountPage() {
     if (isLogo) {
       formData.append("logo", file);
       try {
-        const res = await apiClient.patch("/organizations/my-organization/", formData, {
+        const res = await apiClient.patch("/organizations/my-organization", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         setOrgData(res.data);
@@ -86,7 +87,7 @@ export default function AccountPage() {
     } else {
       formData.append("profile_photo", file);
       try {
-        await apiClient.patch("/accounts/users/me/", formData, {
+        await apiClient.patch("/accounts/users/me", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         const fresh = await me();
@@ -140,7 +141,7 @@ export default function AccountPage() {
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#4F7A57]/10 text-[#4F7A57] overflow-hidden relative">
                   {user && (user as any).profile_photo ? (
-                    <img src={(user as any).profile_photo} alt="Profile" className="object-cover w-full h-full" />
+                    <img src={imageUrl((user as any).profile_photo)} alt="Profile" className="object-cover w-full h-full" />
                   ) : (
                     <User className="h-8 w-8" />
                   )}
@@ -228,7 +229,7 @@ export default function AccountPage() {
             <div className="flex gap-4 mb-6 items-center">
                <div className="h-16 w-16 shrink-0 rounded-md border border-[#D8D3CC] bg-white flex items-center justify-center overflow-hidden">
                  {orgData.logo ? (
-                   <img src={orgData.logo} alt="Company Logo" className="object-contain w-full h-full p-1" />
+                    <img src={imageUrl(orgData.logo)} alt="Company Logo" className="object-contain w-full h-full p-1" />
                  ) : (
                    <Building className="h-6 w-6 text-[#6B6B6B]" />
                  )}

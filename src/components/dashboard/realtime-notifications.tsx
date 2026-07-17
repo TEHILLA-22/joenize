@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { apiClient } from "@/lib/api/client";
 import { Bell } from "lucide-react";
 
 interface NotificationItem {
@@ -36,6 +37,18 @@ export function RealtimeNotifications() {
   );
 
   useEffect(() => {
+    apiClient.get("/notifications").then((res) => {
+      const items = (res.data.results || []).map((n: any) => ({
+        id: n.id,
+        title: n.title,
+        body: n.body,
+        tone: n.tone || "neutral",
+      }));
+      setNotifications(items.slice(0, 5));
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     const apiUrl =
       process.env
         .NEXT_PUBLIC_API_URL;
@@ -45,7 +58,7 @@ export function RealtimeNotifications() {
     }
 
     const streamUrl = new URL(
-      "/api/notifications/stream/",
+      "/api/notifications/stream",
       new URL(apiUrl).origin
     );
 

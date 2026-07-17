@@ -12,19 +12,19 @@ import type {
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://joenize-back.onrender.com/api";
+  "http://localhost:8000/api";
 
 export function getBackendOrigin(): string {
   try {
     return new URL(apiBaseUrl).origin;
   } catch {
-    return "https://joenize-back.onrender.com";
+    return "http://localhost:8000";
   }
 }
 
 export function getGoogleAuthUrl(): string {
   const url = new URL(
-    "/accounts/google/login/",
+    "/auth/google",
     getBackendOrigin()
   );
 
@@ -48,7 +48,7 @@ export async function googleLogin(
 ): Promise<GoogleLoginResponse> {
   const response =
     await apiClient.post<GoogleLoginResponse>(
-      "/auth/google/",
+      "/auth/google",
       payload
     );
 
@@ -60,7 +60,7 @@ export async function login(
 ): Promise<LoginResponse> {
   const response =
     await apiClient.post<LoginResponse>(
-      "/auth/login/",
+      "/auth/login",
       payload
     );
 
@@ -73,7 +73,7 @@ export async function register(
 ): Promise<RegisterResponse> {
   const response =
     await apiClient.post<RegisterResponse>(
-      "/auth/register/",
+      "/auth/register",
       payload
     );
 
@@ -86,7 +86,7 @@ export async function verifyEmail(
 ) {
   const response =
     await apiClient.post(
-      "/auth/verify-email/",
+      "/auth/verify-email",
       {
         token,
       }
@@ -98,18 +98,22 @@ export async function verifyEmail(
 
 export async function logout(): Promise<void> {
   await apiClient.post(
-    "/auth/logout/"
+    "/auth/logout"
   );
 }
 
 
 export async function refreshToken(): Promise<{
   access: string;
+  refresh_token?: string;
 }> {
-  const response =
-    await apiClient.post(
-      "/auth/refresh/"
-    );
+  const authStore = (await import("@/stores/auth-store")).useAuthStore;
+  const refreshTokenValue = authStore.getState().refreshToken;
+
+  const response = await apiClient.post(
+    "/auth/refresh",
+    refreshTokenValue ? { refresh_token: refreshTokenValue } : undefined
+  );
 
   return response.data;
 }
@@ -118,7 +122,7 @@ export async function refreshToken(): Promise<{
 export async function me(): Promise<User> {
   const response =
     await apiClient.get<User>(
-      "/auth/me/"
+      "/auth/me"
     );
 
   return response.data;

@@ -25,6 +25,11 @@ export function LoginForm() {
       (state) =>
         state.setAccessToken
     );
+  const setRefreshToken =
+    useAuthStore(
+      (state) =>
+        state.setRefreshToken
+    );
   const setUser =
     useAuthStore(
       (state) => state.setUser
@@ -56,6 +61,12 @@ export function LoginForm() {
       setAccessToken(
         result.access
       );
+
+      if (result.refresh_token) {
+        setRefreshToken(
+          result.refresh_token
+        );
+      }
 
       const user =
         await me();

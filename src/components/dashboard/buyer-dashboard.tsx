@@ -1,5 +1,11 @@
 "use client";
 
+import Link from "next/link";
+import {
+  ArrowRight,
+  FileText,
+  Plus,
+} from "lucide-react";
 import {
   BuyerStatsGrid,
 } from "@/components/dashboard/buyer-stats-grid";
@@ -62,6 +68,24 @@ export function BuyerDashboard() {
           </p>
         </div>
       </section>
+
+      <div className="flex flex-wrap gap-3">
+        <Link href="/rfq/create"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#D8D3CC] bg-white px-4 py-3 text-sm font-medium text-[#1E1E1E] shadow-sm hover:border-[#4F7A57] hover:text-[#4F7A57] transition-colors">
+          <Plus className="h-4 w-4" />
+          Post new RFQ
+        </Link>
+        <Link href="/rfq/market"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#D8D3CC] bg-white px-4 py-3 text-sm font-medium text-[#1E1E1E] shadow-sm hover:border-[#4F7A57] hover:text-[#4F7A57] transition-colors">
+          <FileText className="h-4 w-4" />
+          Browse RFQ market
+        </Link>
+        <Link href="/dashboard/orders"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#D8D3CC] bg-white px-4 py-3 text-sm font-medium text-[#1E1E1E] shadow-sm hover:border-[#4F7A57] hover:text-[#4F7A57] transition-colors">
+          <ArrowRight className="h-4 w-4" />
+          My orders
+        </Link>
+      </div>
 
       {data ? (
         <BuyerStatsGrid

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type {
   BuyerActivityItem,
 } from "@/services/buyer-workspace.service";
@@ -19,12 +20,12 @@ export function RecentOrders({
           </p>
         </div>
 
-        <a
+        <Link
           className="text-sm font-medium text-[#4F7A57] hover:text-[#1E1E1E]"
-          href="#"
+          href="/dashboard/orders"
         >
           View all
-        </a>
+        </Link>
       </div>
 
       {activity.length > 0 ? (

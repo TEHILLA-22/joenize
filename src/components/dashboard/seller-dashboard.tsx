@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiClient } from "@/lib/api/client";
+import { imageUrl } from "@/lib/api/uploads";
 import { useAuthStore } from "@/stores/auth-store";
 import {
   ArrowRight, BarChart3, CheckCircle2, CreditCard, DollarSign, Edit, Eye,
@@ -63,19 +64,25 @@ export function SellerDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
+      const fetchOne = async (url: string) => {
+        try { return await apiClient.get(url); }
+        catch (e: any) { console.error("Dashboard fetch failed:", url, e?.response?.data || e); return null; }
+      };
       const [statsRes, prodRes, ordersRes, catRes, rfqRes] = await Promise.all([
-        apiClient.get("/seller/dashboard"),
-        apiClient.get("/products/my/list"),
-        apiClient.get("/orders"),
-        apiClient.get("/products/categories"),
-        apiClient.get("/procurement/rfqs"),
+        fetchOne("/seller/dashboard"),
+        fetchOne("/products/my/list"),
+        fetchOne("/orders"),
+        fetchOne("/products/categories"),
+        fetchOne("/procurement/rfqs"),
       ]);
-      setStats(statsRes.data);
-      setProducts(prodRes.data.results || []);
-      setOrders(ordersRes.data.results || []);
-      setCategories(catRes.data.results || []);
-      setRfqs(rfqRes.data.results || []);
-    } catch { /* ignore */ }
+      if (statsRes) setStats(statsRes.data);
+      if (prodRes) setProducts(prodRes.data.results || []);
+      if (ordersRes) setOrders(ordersRes.data.results || []);
+      if (catRes) setCategories(catRes.data.results || []);
+      if (rfqRes) setRfqs(rfqRes.data.results || []);
+    } catch (err: any) {
+      console.error("Dashboard fetch error:", err?.response?.data || err);
+    }
     setLoading(false);
   }, []);
 
@@ -136,7 +143,7 @@ export function SellerDashboard() {
     const amount = quoteAmounts[rfqId];
     if (!amount) return;
     try {
-      await apiClient.post("/procurement/quotes/", { rfq_id: rfqId, amount: parseFloat(amount), notes: "" });
+      await apiClient.post("/procurement/quotes", { rfq_id: rfqId, amount: parseFloat(amount), notes: "" });
       setQuoteAmounts((prev) => ({ ...prev, [rfqId]: "" }));
       fetchData();
     } catch { /* ignore */ }
@@ -212,27 +219,27 @@ export function SellerDashboard() {
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-[#1E1E1E]">Product name</label>
                     <input type="text" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" required />
+                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm text-[#1E1E1E] outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" required />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-[#1E1E1E]">Description</label>
                     <textarea value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" rows={2} />
+                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm text-[#1E1E1E] outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" rows={2} />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1E1E1E]">Price ($)</label>
                     <input type="number" step="0.01" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" required />
+                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm text-[#1E1E1E] outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" required />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1E1E1E]">Stock</label>
                     <input type="number" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" />
+                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm text-[#1E1E1E] outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#1E1E1E]">Category</label>
                     <select value={productForm.category_id} onChange={(e) => setProductForm({ ...productForm, category_id: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" required>
+                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm text-[#1E1E1E] outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" required>
                       <option value="">Select a category</option>
                       {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
@@ -240,12 +247,12 @@ export function SellerDashboard() {
                   <div>
                     <label className="block text-sm font-medium text-[#1E1E1E]">Min. order qty</label>
                     <input type="number" value={productForm.moq} onChange={(e) => setProductForm({ ...productForm, moq: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" />
+                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm text-[#1E1E1E] outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-[#1E1E1E]">Tags (comma-separated)</label>
                     <input type="text" value={productForm.tags} onChange={(e) => setProductForm({ ...productForm, tags: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" />
+                      className="mt-1 block w-full rounded-lg border border-[#D8D3CC] px-3 py-2 text-sm text-[#1E1E1E] outline-none focus:border-[#4F7A57] focus:ring-1 focus:ring-[#4F7A57]" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-[#1E1E1E]">Product images</label>
@@ -291,7 +298,7 @@ export function SellerDashboard() {
                 <div key={p.id} className="flex items-center justify-between rounded-xl border border-[#D8D3CC] bg-white p-4 shadow-sm">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     {p.images && p.images.length > 0 ? (
-                      <img src={p.images[0]?.url} alt="" className="h-12 w-12 rounded-lg object-cover border border-[#D8D3CC]" />
+                      <img src={imageUrl(p.images[0]?.url)} alt="" className="h-12 w-12 rounded-lg object-cover border border-[#D8D3CC]" />
                     ) : (
                       <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#F5F3EF]"><Image className="h-5 w-5 text-[#D8D3CC]" /></span>
                     )}

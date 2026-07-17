@@ -7,6 +7,8 @@ interface AuthStore {
 
   accessToken: string | null;
 
+  refreshToken: string | null;
+
   isAuthenticated: boolean;
 
   hydrated: boolean;
@@ -16,6 +18,10 @@ interface AuthStore {
   ) => void;
 
   setAccessToken: (
+    token: string | null
+  ) => void;
+
+  setRefreshToken: (
     token: string | null
   ) => void;
 
@@ -31,6 +37,8 @@ export const useAuthStore =
     user: null,
 
     accessToken: null,
+
+    refreshToken: null,
 
     hydrated: false,
 
@@ -50,6 +58,13 @@ export const useAuthStore =
           !!token,
       }),
 
+    setRefreshToken: (
+      token
+    ) =>
+      set({
+        refreshToken: token,
+      }),
+
     setHydrated: (
       hydrated
     ) =>
@@ -61,6 +76,7 @@ export const useAuthStore =
       set({
         user: null,
         accessToken: null,
+        refreshToken: null,
         hydrated: true,
         isAuthenticated: false,
       }),

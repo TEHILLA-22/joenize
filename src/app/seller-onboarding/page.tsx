@@ -72,7 +72,7 @@ function SellerOnboardingContent() {
       await saveProfile();
       setStep("paying");
 
-      const payRes = await apiClient.post("/seller/onboarding/initialize", { amount: 29 });
+      const payRes = await apiClient.post("/seller/onboarding/initialize", { amount: 8000 });
       const url = payRes.data.authorization_url;
       setAuthUrl(url);
       window.location.href = url;
@@ -104,7 +104,25 @@ function SellerOnboardingContent() {
       <div className="flex min-h-screen items-center justify-center bg-[#F5F3EF]">
         <div className="rounded-2xl border border-[#D8D3CC] bg-white p-8 shadow-sm text-center max-w-md">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#4F7A57]" />
-          <p className="mt-4 text-sm text-[#6B6B6B]">Redirecting to payment...</p>
+          <p className="mt-4 text-sm font-medium text-[#1E1E1E]">Redirecting to payment...</p>
+          <p className="mt-1 text-xs text-[#6B6B6B]">Complete your payment in the new tab. Return here when done.</p>
+          <button
+            type="button"
+            onClick={() => { setAuthUrl(""); setStep("form"); setError(""); }}
+            className="mt-6 text-sm text-[#6B6B6B] underline hover:text-[#1E1E1E]"
+          >
+            Cancel and go back
+          </button>
+          {authUrl && (
+            <a
+              href={authUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 block text-sm font-medium text-[#4F7A57] underline hover:text-[#3D6344]"
+            >
+              Open payment page again
+            </a>
+          )}
         </div>
       </div>
     );
@@ -246,7 +264,7 @@ function SellerOnboardingContent() {
               <div className="flex items-center gap-3">
                 <CreditCard className="h-5 w-5 text-[#4F7A57]" />
                 <div>
-                  <p className="text-sm font-semibold text-[#1E1E1E]">Onboarding fee: $29.00</p>
+                  <p className="text-sm font-semibold text-[#1E1E1E]">Onboarding fee: ₦8,000</p>
                   <p className="text-xs text-[#6B6B6B]">One-time payment to unlock your seller account</p>
                 </div>
               </div>

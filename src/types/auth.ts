@@ -27,6 +27,7 @@ export interface GoogleLoginRequest {
 
 export interface GoogleLoginResponse {
   access: string;
+  refresh_token?: string;
   user: User;
 }
 
